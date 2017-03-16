@@ -19,9 +19,9 @@
         <param type="data" name="input_sequence" format="fastq,fasta" label="Input Sequence" />
 
         <param type="select" name="input_type"  label="Input Type" multiple="false">
-            <option value="contig" selected="true">contig (Nucluotides Sequence)</option>
-            <option value="protein">protein (Protein Sequence)</option>
-            <option value="read">read (Metagenomics Sequence / FastQ)</option>
+            <option value="contig" selected="true">CONTIG (Nucluotides Sequence)</option>
+            <option value="protein">PROTEIN (Protein Sequence)</option>
+            <option value="read">READ (Metagenomics Sequence / FastQ)</option>
         </param>
 
         <param type="select" name="alignment_tool"  label="Alignment Tool">
