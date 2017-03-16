@@ -1,0 +1,12 @@
+# create virtual env
+$ touch /Users/amos/.planemo/gx_venv/bin/activate
+
+# activate the virtual env
+$ source /Users/amos/.planemo/gx_venv/bin/activate
+
+$ source deactivate
+
+
+#pip install --ignore-installed --upgrade pip setuptools
+
+conda update setuptools

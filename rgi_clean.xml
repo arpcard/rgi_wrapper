@@ -1,0 +1,37 @@
+<tool id="rgi_clean" name="Resistance Gene Identifier (RGI) - Cleans BLAST databases" version="3.1.2">
+    <description>This tool cleans BLAST databases used by RGI</description>
+    <requirements>
+    </requirements>
+    <stdio>
+        <exit_code range="1:" />
+    </stdio>
+    <command><![CDATA[
+        rgi_clean
+    ]]></command>
+    <inputs>
+    </inputs>
+    <outputs>
+    </outputs>
+    <tests>
+        <test>
+        </test>
+    </tests>
+    <help><![CDATA[
+        usage: rgi_clean [-h]
+
+Removes BLAST databases created using card.json
+
+optional arguments:
+  -h, --help  show this help message and exit
+
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+@misc{renameTODO,
+  author = {LastTODO, FirstTODO},
+  year = {TODO},
+  title = {TODO},
+  url = {https://card.mcmaster.ca/about},
+}</citation>
+    </citations>
+</tool>

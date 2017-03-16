@@ -1,0 +1,6 @@
+rm -r test-data
+rm *.xml
+rm *.json
+rm *.txt
+rm data*
+source deactivate

@@ -1,0 +1,12 @@
+planemo tool_init \
+--force \
+--id 'rgi_load' \
+--name 'Resistance Gene Identifier (RGI) - Loads new CARD data into RGI tool' \
+--version '3.1.2' \
+--description 'This tool loads new CARD data into RGI tool' \
+--help_from_command 'rgi_load -h ' \
+--input 'card.json' \
+--test_case \
+--example_command 'rgi_load -i card.json' \
+--example_input 'card.json' \
+--cite_url 'https://card.mcmaster.ca/about'

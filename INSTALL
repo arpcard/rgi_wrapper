@@ -1,0 +1,55 @@
+# Run init to geenerate all xml files
+$ ./init
+
+OR 
+
+# Run init_rgi to generate rgi.xml
+$ ./init_rgi
+
+# Run init_clean to generate clean.xml
+$ ./init_clean
+
+
+# Run init_tab to generate tab.xml
+$ ./init_tab
+
+
+# Run init_load to generate load.xml
+$ ./init_load
+
+# add update GALAXY_SLOTS
+
+\${GALAXY_SLOTS:-Z}
+
+Z is the defaul value
+
+Example: For number of threads for RGI
+
+\${GALAXY_SLOTS:-32}
+
+
+-------
+
+
+--test_case \
+#--example_command 'rgi --input_sequence sequence.fasta --input_type CONTIG --out_file Report.json --num_threads 32  --verbose ON --alignment_tool BLAST' \
+#--example_input 'sequence.fasta' \
+#--example_output 'Report.json' \
+
+
+-------
+
+
+    <!--
+    <outputs>
+        <collection type="list" label="RGI: Output">
+          <!--<collection type="list" label="RGI: Output" name="Report"> -->
+           <!-- <discover_datasets pattern="(?P&lt;name&gt;.*)" from_work_dir="Report" visible="true"  name="Report" /> --
+            <discover_datasets pattern="__designation__" from_work_dir="Report.*"/>
+            <!--
+            <discover_datasets pattern="__designation__" from_work_dir="Report.json" name="Report" format="json" visible="true" label="RGI: Output (JSON)" />
+            <discover_datasets pattern="__designation__" from_work_dir="Report.txt" name="Report" format="tabular" visible="true" label="RGI: Output (TXT)" />
+          --
+        </collection>
+    </outputs>
+  -->

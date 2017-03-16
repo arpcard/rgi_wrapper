@@ -1,0 +1,53 @@
+<tool id="rgi_jsontab" name="Resistance Gene Identifier (RGI) - Convert RGI JSON to Tab-delimited" version="3.1.2">
+    <description>This tool converts RGI json output file to tab-demited output</description>
+    <requirements>
+    </requirements>
+    <stdio>
+        <exit_code range="1:" />
+    </stdio>
+    <command><![CDATA[
+        rgi_jsontab -i "$input1" -o "$output1"
+    ]]></command>
+    <inputs>
+        <param type="data" name="Report" format="json" />
+        <param type="data" name="input1" format="json" />
+    </inputs>
+    <outputs>
+        <data name="dataSummary" format="txt" />
+        <data name="output1" format="txt" />
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="Report.json"/>
+            <output name="output1" file="dataSummary.txt"/>
+        </test>
+    </tests>
+    <help><![CDATA[
+        usage: rgi_jsontab [-h] [-i AFILE] [-o OUTPUT] [-x ORF] [-v VERBOSE]
+
+Convert RGI JSON file to Tab-delimited file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i AFILE, --afile AFILE
+                        must be a json file generated from RGI in JSON or gzip
+                        format e.g out.json, out.json.gz
+  -o OUTPUT, --out_file OUTPUT
+                        Output JSON file (default=dataSummary)
+  -x ORF, --orf ORF     choose between prodigal and MetaGeneMark orf finder.
+                        Options are PRODIGAL or GENEMARK (default = PRODIGAL)
+  -v VERBOSE, --verbose VERBOSE
+                        include help menu. Options are OFF or ON (default =
+                        OFF for no help)
+
+    ]]></help>
+    <citations>
+        <citation type="bibtex">
+@misc{renameTODO,
+  author = {LastTODO, FirstTODO},
+  year = {TODO},
+  title = {TODO},
+  url = {https://card.mcmaster.ca/about},
+}</citation>
+    </citations>
+</tool>

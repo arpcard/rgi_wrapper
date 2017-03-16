@@ -1,0 +1,14 @@
+planemo tool_init \
+--force \
+--id 'rgi_jsontab' \
+--name 'Resistance Gene Identifier (RGI) - Convert RGI JSON to Tab-delimited' \
+--version '3.1.2' \
+--description 'This tool converts RGI json output file to tab-demited output' \
+--help_from_command 'rgi_jsontab -h ' \
+--input 'Report.json' \
+--output 'dataSummary.txt' \
+--test_case \
+--example_command 'rgi_jsontab -i Report.json -o dataSummary.txt' \
+--example_input 'Report.json' \
+--example_output 'dataSummary.txt' \
+--cite_url 'https://card.mcmaster.ca/about'

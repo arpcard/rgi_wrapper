@@ -1,0 +1,36 @@
+# push tools to test shed
+planemo shed_update --check_diff --shed_target testtoolshed
+
+# Need the following enabled in galaxy instance to run RGI
+
+config/galaxy.ini:
+
+# -- Tool dependencies
+
+# The dependency resolvers config file specifies an ordering and options for how
+# Galaxy resolves tool dependencies (requirement tags in Tool XML). The default
+# ordering is to the use the Tool Shed for tools installed that way, use local
+# Galaxy packages, and then use Conda if available.
+# See https://github.com/galaxyproject/galaxy/blob/dev/doc/source/admin/dependency_resolvers.rst
+# for more information on these options.
+dependency_resolvers_config_file = config/dependency_resolvers_conf.xml
+
+# conda_prefix is the location on the filesystem where Conda packages and environments are installed
+# IMPORTANT: Due to a current limitation in conda, the total length of the
+# conda_prefix and the job_working_directory path should be less than 50 characters!
+#conda_prefix = <tool_dependency_dir>/_conda
+# Override the Conda executable to use, it will default to the one on the
+# PATH (if available) and then to <conda_prefix>/bin/conda
+#conda_exec =
+# Pass debug flag to conda commands.
+#conda_debug = False
+# conda channels to enable by default (http://conda.pydata.org/docs/custom-channels.html)
+conda_ensure_channels = conda-forge,r,bioconda,iuc
+# Set to True to instruct Galaxy to look for and install missing tool
+# dependencies before each job runs.
+conda_auto_install = True
+# Set to True to perform additional checking of installed Conda environment
+conda_verbose_install_check=True
+# Set to True to instruct Galaxy to install Conda from the web automatically
+# if it cannot find a local copy and conda_exec is not configured.
+conda_auto_init = True
