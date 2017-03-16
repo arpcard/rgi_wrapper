@@ -20,14 +20,15 @@
         </test>
     </tests>
     <help><![CDATA[
-        usage: rgi_load [-h] [-i AFILE]
 
-Load card database json file
+            usage: rgi_load [-h] [-i AFILE]
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -i AFILE, --afile AFILE
-                        must be a card database json file
+            Load card database json file
+
+            optional arguments:
+              -h, --help            show this help message and exit
+              -i AFILE, --afile AFILE
+                                    must be a card database json file
 
     ]]></help>
     <citations>

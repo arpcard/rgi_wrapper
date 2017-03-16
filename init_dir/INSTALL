@@ -1,0 +1,29 @@
+# Run init to geenerate all xml files
+$ ./init
+
+OR 
+
+# Run init_rgi to generate rgi.xml
+$ ./init_rgi
+
+# Run init_clean to generate clean.xml
+$ ./init_clean
+
+
+# Run init_tab to generate tab.xml
+$ ./init_tab
+
+
+# Run init_load to generate load.xml
+$ ./init_load
+
+# add update GALAXY_SLOTS
+
+\${GALAXY_SLOTS:-Z}
+
+Z is the defaul value
+
+Example: For number of threads for RGI
+
+\${GALAXY_SLOTS:-32}
+

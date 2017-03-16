@@ -17,12 +17,13 @@
         </test>
     </tests>
     <help><![CDATA[
+
         usage: rgi_clean [-h]
 
-Removes BLAST databases created using card.json
+        Removes BLAST databases created using card.json
 
-optional arguments:
-  -h, --help  show this help message and exit
+        optional arguments:
+          -h, --help  show this help message and exit
 
     ]]></help>
     <citations>

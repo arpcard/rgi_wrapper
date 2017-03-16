@@ -1,0 +1,10 @@
+planemo tool_init \
+--force \
+--id 'rgi_clean' \
+--name 'Resistance Gene Identifier (RGI) - Cleans BLAST databases' \
+--version '3.1.2' \
+--description 'This tool cleans BLAST databases used by RGI' \
+--help_from_command 'rgi_clean -h ' \
+--test_case \
+--example_command 'rgi_clean' \
+--cite_url 'https://card.mcmaster.ca/about'

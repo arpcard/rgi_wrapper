@@ -23,22 +23,21 @@
         </test>
     </tests>
     <help><![CDATA[
-        usage: rgi_jsontab [-h] [-i AFILE] [-o OUTPUT] [-x ORF] [-v VERBOSE]
+      
+        usage: rgi_jsontab [-h] [-i AFILE] [-o OUTPUT] [-v VERBOSE]
 
-Convert RGI JSON file to Tab-delimited file
+        Convert RGI JSON file to Tab-delimited file
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -i AFILE, --afile AFILE
-                        must be a json file generated from RGI in JSON or gzip
-                        format e.g out.json, out.json.gz
-  -o OUTPUT, --out_file OUTPUT
-                        Output JSON file (default=dataSummary)
-  -x ORF, --orf ORF     choose between prodigal and MetaGeneMark orf finder.
-                        Options are PRODIGAL or GENEMARK (default = PRODIGAL)
-  -v VERBOSE, --verbose VERBOSE
-                        include help menu. Options are OFF or ON (default =
-                        OFF for no help)
+        optional arguments:
+          -h, --help            show this help message and exit
+          -i AFILE, --afile AFILE
+                                must be a json file generated from RGI in JSON or gzip
+                                format e.g out.json, out.json.gz
+          -o OUTPUT, --out_file OUTPUT
+                                Output Tab-delimited file (default=dataSummary)
+          -v VERBOSE, --verbose VERBOSE
+                                include help menu. Options are OFF or ON (default =
+                                OFF for no help)
 
     ]]></help>
     <citations>

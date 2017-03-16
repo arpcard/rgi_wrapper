@@ -1,0 +1,18 @@
+planemo tool_init \
+--force \
+--id 'rgi' \
+--name 'Resistance Gene Identifier (RGI)' \
+--version '3.1.2' \
+--description 'This tool predict resistome(s) from protein or nucleotide data based on homology and SNP models' \
+--requirement python@2.7 \
+--requirement biopython@1.68 \
+--requirement six@1.9.0 \
+--requirement prodigal@2.6.3 \
+--requirement diamond@0.8.36 \
+--requirement zlib@1.2.8 \
+--help_from_command 'rgi -h ' \
+--command 'rgi --input_sequence $input_sequence --input_type $input_type --out_file $output1 --num_threads "\${GALAXY_SLOTS:-32}"  --verbose $verbose --alignment_tool $alignment_tool' \
+--input 'sequence.fasta' \
+--output 'sequence.fasta.output' \
+--named_output 'Report.json' \
+--cite_url 'https://card.mcmaster.ca/about'
