@@ -2,17 +2,18 @@
     <description>This tool predict resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
         <requirement type="package" version="2.7">python</requirement>
+        <requirement type="package" version="3.1.2">rgi</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="1.9.0">six</requirement>
         <requirement type="package" version="2.6.3">prodigal</requirement>
-        <requirement type="package" version=">=0.8.24">diamond</requirement>
+        <requirement type="package" version="0.8.24">diamond</requirement>
         <requirement type="package" version="1.2.8">zlib</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
     <command><![CDATA[
-        rgi --input_sequence $input_sequence --input_type $input_type --output_file Report --num_threads "\${GALAXY_SLOTS:-32}"  --verbose $verbose --alignment_tool $alignment_tool --loose_criteria $loose_criteria --clean $clean --db "${__tool_data_path__}/rgi_databases/$rgi_databases"
+        rgi --input_sequence $input_sequence --input_type $input_type --num_threads "\${GALAXY_SLOTS:-32}"  --verbose $verbose --alignment_tool $alignment_tool --loose_criteria $loose_criteria --clean $clean --db "${__tool_data_path__}/rgi_databases/$rgi_databases"
     ]]></command>
     <inputs>
 
@@ -39,7 +40,7 @@
             <option value="no">NO</option>
         </param>
 
-        <param type="select" name="loose_criteria" label="Exclude loose hits (CRITERIA)" multiple="false">
+        <param type="select" name="loose_criteria" label="Include loose hits (CRITERIA)" multiple="false">
           <option value="yes">YES</option>
           <option value="no" selected="true">NO</option>
         </param>

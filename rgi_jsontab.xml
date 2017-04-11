@@ -1,6 +1,7 @@
 <tool id="rgi_jsontab" name="Resistance Gene Identifier (RGI) - Convert RGI JSON to Tab-delimited" version="3.1.2">
     <description>This tool converts RGI json output file to tab-demited output</description>
     <requirements>
+        <requirement type="package" version="3.1.2">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
