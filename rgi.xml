@@ -1,19 +1,21 @@
-<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="3.1.2">
+<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="3.2.0">
     <description>This tool predict resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
         <requirement type="package" version="2.7">python</requirement>
-        <requirement type="package" version="3.1.2">rgi</requirement>
+        <requirement type="package" version="3.2.0">rgi</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
-        <requirement type="package" version="1.9.0">six</requirement>
+        <requirement type="package" version="1.10.0">six</requirement>
         <requirement type="package" version="2.6.3">prodigal</requirement>
-        <requirement type="package" version="0.8.24">diamond</requirement>
+        <requirement type="package" version="2.6.0">blast</requirement>
+        <requirement type="package" version="0.8.36">diamond</requirement>
         <requirement type="package" version="1.2.8">zlib</requirement>
+
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
     <command><![CDATA[
-        rgi --input_sequence $input_sequence --input_type $input_type --num_threads "\${GALAXY_SLOTS:-32}"  --verbose $verbose --alignment_tool $alignment_tool --loose_criteria $loose_criteria --clean $clean --db "${__tool_data_path__}/rgi_databases/$rgi_databases"
+        rgi --input_sequence $input_sequence --input_type $input_type --num_threads "\${GALAXY_SLOTS:-32}" --clean_databases NO --verbose $verbose --alignment_tool $alignment_tool --loose_criteria $loose_criteria --clean $clean --db "${__tool_data_path__}/rgi_databases/$rgi_databases"
     ]]></command>
     <inputs>
 
@@ -70,16 +72,16 @@
     </tests>
     <help><![CDATA[
 
-        usage: rgi [-h] [-t INTYPE] [-i INPUTSEQ] [-n THREADS] [-o OUTPUT]
-                      [-e CRITERIA] [-c CLEAN] [-d DATA] [-l VERBOSE] [-a ALIGNER]
-                      [-r DATABASE] [-sv] [-dv]
+        usage: rgi [-h] [-t INTYPE] [-i INPUTSEQ] [-n THREADS] [-k NUM_SEQUENCES]
+                      [-o OUTPUT] [-e CRITERIA] [-c CLEAN] [-cd CLEAN_DATABASES]
+                      [-d DATA] [-l VERBOSE] [-a ALIGNER] [-r DATABASE] [-sv] [-dv]
 
-        Resistance Gene Identifier - Version 3.1.2
+        Resistance Gene Identifier - Version 3.2.0
 
         optional arguments:
           -h, --help            show this help message and exit
           -t INTYPE, --input_type INTYPE
-                                must be one of contig, orf, protein, read (default:
+                                must be one of contig, protein and read (default:
                                 contig)
           -i INPUTSEQ, --input_sequence INPUTSEQ
                                 input file must be in either FASTA (contig and
@@ -88,6 +90,9 @@
           -n THREADS, --num_threads THREADS
                                 Number of threads (CPUs) to use in the BLAST search
                                 (default=32)
+          -k NUM_SEQUENCES, --max_target_seqs NUM_SEQUENCES
+                                maximum number of target sequences to report
+                                alignments for (default=1)
           -o OUTPUT, --output_file OUTPUT
                                 Output JSON file (default=Report)
           -e CRITERIA, --loose_criteria CRITERIA
@@ -97,6 +102,9 @@
                                 This removes temporary files in the results directory
                                 after run. Options are NO or YES (default=YES for
                                 remove)
+          -cd CLEAN_DATABASES, --clean_databases CLEAN_DATABASES
+                                This removes blast databases before rgi run. Options
+                                are NO or YES (default=YES for remove)
           -d DATA, --data DATA  Specify a data-type, i.e. wgs, chromosome, plasmid,
                                 etc. (default = NA)
           -l VERBOSE, --verbose VERBOSE

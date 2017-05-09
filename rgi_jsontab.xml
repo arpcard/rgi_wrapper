@@ -1,7 +1,7 @@
-<tool id="rgi_jsontab" name="Resistance Gene Identifier (RGI) - Convert RGI JSON to Tab-delimited" version="3.1.2">
+<tool id="rgi_jsontab" name="Resistance Gene Identifier (RGI) - Convert RGI JSON to Tab-delimited" version="3.2.0">
     <description>This tool converts RGI json output file to tab-demited output</description>
     <requirements>
-        <requirement type="package" version="3.1.2">rgi</requirement>
+        <requirement type="package" version="3.2.0">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
@@ -26,6 +26,7 @@
     <help><![CDATA[
       
         usage: rgi_jsontab [-h] [-i AFILE] [-o OUTPUT] [-v VERBOSE]
+                                   [--headers]
 
         Convert RGI JSON file to Tab-delimited file
 
@@ -39,6 +40,8 @@
           -v VERBOSE, --verbose VERBOSE
                                 include help menu. Options are OFF or ON (default =
                                 OFF for no help)
+          --headers             print tab-delimted help. Options are OFF or ON
+                                (default = OFF for no help)
 
     ]]></help>
     <citations>
