@@ -1,14 +1,14 @@
-<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="3.2.0">
+<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="4.2.2">
     <description>This tool predict resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
-        <requirement type="package" version="2.7">python</requirement>
-        <requirement type="package" version="3.2.0">rgi</requirement>
+        <requirement type="package" version="3.6">python</requirement>
+        <requirement type="package" version="4.2.2">rgi</requirement>
         <requirement type="package" version="1.68">biopython</requirement>
         <requirement type="package" version="1.10.0">six</requirement>
         <requirement type="package" version="2.6.3">prodigal</requirement>
         <requirement type="package" version="2.6.0">blast</requirement>
         <requirement type="package" version="0.8.36">diamond</requirement>
-        <requirement type="package" version="1.2.8">zlib</requirement>
+		<requirement type="package" version="1.2.8">zlib</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
@@ -65,7 +65,7 @@
                    [-o OUTPUT] [-e CRITERIA] [-c CLEAN] [-cd CLEAN_DATABASES]
                    [-d DATA] [-l VERBOSE] [-a ALIGNER] [-r DATABASE] [-sv] [-dv]
 
-        Resistance Gene Identifier - Version 3.2.0
+        Resistance Gene Identifier - Version 4.2.2
 
         optional arguments:
           -h, --help            show this help message and exit
