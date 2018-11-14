@@ -1,59 +1,69 @@
 <tool id="rgi" name="Resistance Gene Identifier (RGI)" version="4.2.2">
     <description>This tool predicts resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
-        <requirement type="package" version="3.6">python</requirement>
         <requirement type="package" version="4.2.2">rgi</requirement>
-        <requirement type="package" version="1.68">biopython</requirement>
-        <requirement type="package" version="1.10.0">six</requirement>
-        <requirement type="package" version="2.6.3">prodigal</requirement>
-        <requirement type="package" version="2.6.0">blast</requirement>
-        <requirement type="package" version="0.8.36">diamond</requirement>
-		<requirement type="package" version="1.2.8">zlib</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
 	<command><![CDATA[
 rgi load 
-	-i "${__tool_data_path__}/rgi_databases/$rgi_database/card.json"
+    #if $db_opts.db_opts_selector == "local":
+        -i "${__tool_data_path__}/rgi_databases/$db_opts.rgi_db_local/card.json" 
+    #else:
+        -i $db_opts.rgi_db_hist
+    #end if
+    --local
 &&
 rgi main
-	-i $input_sequence
+	-i '$input_sequence'
 	-o out
 	-t $input_type
 	-a $alignment_tool
 	-n "\${GALAXY_SLOTS:-1}"
 	$include_loose
-	$clean
+    --local
 	$low_quality
-	-d $data_type
+	-d $data
    	]]></command>
     <inputs>
-        <param name="input_sequence" type="data" format="fastq,fasta" label="Input sequence"/>
-        <param name="input_type" type="select" multiple="false" label="Input type">
+        <param argument="--input_sequence" type="data" format="fastq,fasta" label="Input sequence" help="input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz"/>
+        <param argument="--input_type" type="select" multiple="false" label="Input type" help="specify data input type (default = contig)">
             <option value="read">READ (Metagenomics Sequence / FastQ)</option>
             <option value="contig" selected="true">CONTIG (Nucleotide Sequence)</option>
             <option value="protein">PROTEIN (Protein Sequence)</option>
             <option value="wgs">WGS (Whole Genome Sequence)</option>
         </param>
-        <param name="alignment_tool" type="select" label="Alignment tool">
+        <param argument="--alignment_tool" type="select" label="Alignment tool" help="specify alignment tool (default = BLAST)">
             <option value="blast" selected="true">BLAST</option>
             <option value="diamond">DIAMOND</option>
 		</param>
-		<param name="include_loose" type="boolean" checked="false" truevalue="--include_loose" falsevalue="" label="Include loose hits"/>
-		<param name="clean" type="boolean" checked="false" truevalue="--clean" falsevalue="" label="Remove temporary files"/>
-		<param name="low_quality" type="boolean" checked="false" truevalue="--low_quality" falsevalue="" label="Low quality"/>
-		<param name="data_type" type="select" multiple="false" label="Data type">
+		<param argument="--include_loose" type="boolean" checked="false" truevalue="--include_loose" falsevalue="" label="Include loose hits" help="include loose hits in addition to strict and perfect hits"/>
+		<param argument="--low_quality" name="low_quality" type="boolean" checked="false" truevalue="--low_quality" falsevalue="" label="Low quality" help="use for short contigs to predict partial genes"/>
+		<param argument="--data" type="select" multiple="false" label="Data type" help="specify a data-type (default = NA)">
 			<option value="wgs">WGS</option>
 			<option value="plasmid">PLASMID</option>
 			<option value="chromosome">CHROMOSOME</option>
             <option value="NA" selected="true">NA</option>
 		</param>
-        <param name="rgi_database" type="select" label="Select an RGI database">
-            <options from_data_table="rgi_databases">
-                <validator type="no_options" message="No databases are available built-in"/>
-            </options>
-        </param>
+        <conditional name="db_opts">
+            <param name="db_opts_selector" type="select" label="Select an RGI database">
+                <option value="local" selected="true">Locally installed RGI database</option>
+                <option value="hist">RGI database from your history</option>
+            </param>
+            <when value="local">
+                <param name="rgi_db_local" type="select" multiple="false" label="Locally installed RGI database">
+                    <options from_data_table="rgi_databases">
+                        <validator type="no_options" message="No databases are available built-in"/>
+                    </options>
+                </param>
+                <param name="rgi_db_hist" type="hidden" value="" />
+            </when>
+            <when value="hist">
+                <param name="rgi_db_local" type="hidden" value="" />
+                <param name="rgi_db_hist" type="data" format="json" label="RGI database from your history" />
+            </when>
+        </conditional>
     </inputs>
     <outputs>
         <data name="report" format="json" from_work_dir="out.json" label="${tool.name} on ${on_string}: report.json"/>
@@ -90,11 +100,11 @@ summary.txt
 
 A tabular file of all detected resistance genes, one gene per line.
 
-+--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------+--------------------------------+-----------+
-| ORF_ID                                                                                                                   | Contig        | Start | Stop | Orientation | Cut_Off  | Pass_Bitscore  | Best_Hit_Bitscore   | Best_Hit_ARO   | Best_Identities  | ARO      | Model_type            | SNPs_in_Best_Hit_ARO     | Other_SNPs  | Drug Class | Resistance Mechanism    | AMR Gene Family      | Predicted_DNA                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Predicted_Protein                                                                                                                                                                                                                                                                                                | CARD_Protein_Sequence                                                                                                                                                                                                                                                                            | Percentage Length of Reference Sequence | ID                             | Model_ID  |
-+==========================================================================================================================+===============+=======+======+=============+==========+================+=====================+================+==================+==========+=======================+==========================+=============+============+=========================+======================+=====================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+==================================================================================================================================================================================================================================================================================================================+==================================================================================================================================================================================================================================================================================================+=========================================+================================+===========+
-| AY123251.1_6 # 3575 # 4489 # 1 # ID=1_6;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.399           | AY123251.1_6  | 3575  | 4489 | +           | Strict   | 500            | 506.908             | CARB-7         | 83.68            | 3002246  | protein homolog model | n/a                      | n/a         | penam      | antibiotic inactivation | CARB beta-lactamase  | ATGCTTTTATATAAAATGTGTGACAATCAAAATTATGGGGTTACTTACATGAAGTTTTTATTGGTATTTTCGCTTTTAATACCATCCGTGGTTTTTGCAAGTAGTTCAAAGTTTCGGCAAGTTGAACAAGACGTTAAGGCAATTGAAGTTTCTCTTTCTGCTCGTATAGGTGTTTCCGTTCTTGATACTCAAAATGGAGAATACTGGGATTACAATGGCAATCAGCGCTTCCCGTTGACAAGTACTTTTAAAACAATAGCTTGCGCTAAATTACTATATGATGCTGAGCAAGGAAAAGTTAATCCCAATAGTACAATCGAGATTAAGAAAGCAGATCTTGTGACCTATTCCCCTGTAATAGAAAAGCAAGTAGGGCAGGCAATCACACTCGATGATGCGTGCTTCGCAACTATGACTACAAGTGATAATACTGCGGCAAATATCATCCTAAGTGCTGTAGGTGGCTCCAAAGGCGTTACTGATTTTTTAAGACAAATTGGGGACAAAGAGACTCGTCTAGACCGTATTGAGCCTGATTTAAATGAAGGTAAGCTCGGTGATTTGAGGGATACGACAACTCCTAAGGCAATAGCCAGTACTTTGAATAAATTTTTATTTGGTTCAGCGCTATCTGAAATGAACAAAAAAAAATTAGAGTCTTGGATGGTGAACAATCAAGTCACTGGTAATTTACTACGTTCAGTATTGCCGGCGGGATGGAACATTGCGGATCGTTCAGGTGCTGGCGGATTTGGTGCTCGGAGTATTACAGCAGTTGTGTGGAGTGAGCATCAAGCCCCAATTATTGTGAGCATCTATCTAGCTCAAACACAGGCTTCAATGGCAGAGCGAAATGATGCGATTGTTAAAATTGGTCGTTCAATTTTTGACGTTTATACATCACAGTCGCGCTGA | MLLYKMCDNQNYGVTYMKFLLVFSLLIPSVVFASSSKFRQVEQDVKAIEVSLSARIGVSVLDTQNGEYWDYNGNQRFPLTSTFKTIACAKLLYDAEQGKVNPNSTIEIKKADLVTYSPVIEKQVGQAITLDDACFATMTTSDNTAANIILSAVGGSKGVTDFLRQIGDKETRLDRIEPDLNEGKLGDLRDTTTPKAIASTLNKFLFGSALSEMNKKKLESWMVNNQVTGNLLRSVLPAGWNIADRSGAGGFGARSITAVVWSEHQAPIIVSIYLAQTQASMAERNDAIVKIGRSIFDVYTSQSR | MKSLLVFALLMPSVVFASSSKFQSVEQEIKGIESSLSARIGVAILDTQNGESWDYNGDQRFPLTSTFKTIACAKLLYDAEHGKVNLNSTVEIKKADLVTYSPVLEKQVGKPITLSDACLATMTTSDNTAANIVINAVGDPKSITDFLRQIGDKETRLDRVEPELNEGKLGDLRDTTTPNAITSTLNQLLFGSTLSEASQKKLESWMVNNQVTGNLLRSVLPVKWSIADRSGAGGFGARSITAIVWSEEKKPIIVSIYLAQTEASMAERNDAIVKIGRSIFEVYTSQSR | 105.56                                  | gnl|BL_ORD_ID|589|hsp_num:0    | 1443      |
-+--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------+--------------------------------+-----------+
++--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+---------------------------+------------------------+---------------------------+-----------------------------------------+--------------------------------+-----------+
+| ORF_ID                                                                                                                   | Contig        | Start | Stop | Orientation | Cut_Off  | Pass_Bitscore  | Best_Hit_Bitscore   | Best_Hit_ARO   | Best_Identities  | ARO      | Model_type            | SNPs_in_Best_Hit_ARO     | Other_SNPs  | Drug Class | Resistance Mechanism    | AMR Gene Family      | Predicted_DNA             | Predicted_Protein      | CARD_Protein_Sequence     | Percentage Length of Reference Sequence | ID                             | Model_ID  |
++==========================================================================================================================+===============+=======+======+=============+==========+================+=====================+================+==================+==========+=======================+==========================+=============+============+=========================+======================+===========================+========================+===========================+=========================================+================================+===========+
+| AY123251.1_6 # 3575 # 4489 # 1 # ID=1_6;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.399           | AY123251.1_6  | 3575  | 4489 | \+          | Strict   | 500            | 506.908             | CARB-7         | 83.68            | 3002246  | protein homolog model | n/a                      | n/a         | penam      | antibiotic inactivation | CARB beta-lactamase  | ATGC                      | MLLYKMCDNQNYGVTYMKFLLV | MKSLLVFALLMPSVVFASSSKFQSV | 105.56                                  | gnl|BL_ORD_ID|589|hsp_num:0    | 1443      |
++--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+---------------------------+------------------------+---------------------------+-----------------------------------------+--------------------------------+-----------+
 
 report.json
 ^^^^^^^^^^^
@@ -141,18 +151,12 @@ Links
 
 RGI: https://card.mcmaster.ca/analyze/rgi
 
-Github: https://github.com/phac-nml/rgi
+Github: https://github.com/arpcard/rgi
 
 CARD database: https://card.mcmaster.ca
  	]]>
     </help>
     <citations>
-    	<citation type="bibtex">
-@ARTICLE{CARD2017,
-  author = {Jia B, Raphenya AR, Alcock B, Waglechner N, Guo P, Tsang KK, Lago BA, Dave BM, Pereira S, Sharma AN, Doshi S, Courtot M, Lo R, Williams LE, Frye JG, Elsayegh T, Sardar D, Westman EL, Pawlowski AC, Johnson TA, Brinkman FS, Wright GD, McArthur AG},
-  year = {2017},
-  title = {CARD 2017: expansion and model-centric curation of the comprehensive antibiotic resistance database.},
-  url = {https://card.mcmaster.ca/about},
-}		</citation>
+        <citation type="doi">10.1093/nar/gkw1004</citation>
     </citations>
 </tool>
