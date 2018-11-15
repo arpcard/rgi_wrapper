@@ -6,26 +6,26 @@
     <stdio>
         <exit_code range="1:" />
     </stdio>
-	<command><![CDATA[
-rgi load 
+    <command><![CDATA[
+rgi load
     #if $db_opts.db_opts_selector == "local":
         -i "${__tool_data_path__}/rgi_databases/$db_opts.rgi_db_local/card.json" 
     #else:
-        -i $db_opts.rgi_db_hist
+        -i "$db_opts.rgi_db_hist"
     #end if
     --local
 &&
 rgi main
-	-i '$input_sequence'
-	-o out
-	-t $input_type
-	-a $alignment_tool
-	-n "\${GALAXY_SLOTS:-1}"
-	$include_loose
+    -i '$input_sequence'
+    -o out
+    -t $input_type
+    -a $alignment_tool
+    -n "\${GALAXY_SLOTS:-1}"
+    $include_loose
     --local
-	$low_quality
-	-d $data
-   	]]></command>
+    $low_quality
+    -d $data
+       ]]></command>
     <inputs>
         <param argument="--input_sequence" type="data" format="fastq,fasta" label="Input sequence" help="input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz"/>
         <param argument="--input_type" type="select" multiple="false" label="Input type" help="specify data input type (default = contig)">
@@ -37,15 +37,15 @@ rgi main
         <param argument="--alignment_tool" type="select" label="Alignment tool" help="specify alignment tool (default = BLAST)">
             <option value="blast" selected="true">BLAST</option>
             <option value="diamond">DIAMOND</option>
-		</param>
-		<param argument="--include_loose" type="boolean" checked="false" truevalue="--include_loose" falsevalue="" label="Include loose hits" help="include loose hits in addition to strict and perfect hits"/>
-		<param argument="--low_quality" name="low_quality" type="boolean" checked="false" truevalue="--low_quality" falsevalue="" label="Low quality" help="use for short contigs to predict partial genes"/>
-		<param argument="--data" type="select" multiple="false" label="Data type" help="specify a data-type (default = NA)">
-			<option value="wgs">WGS</option>
-			<option value="plasmid">PLASMID</option>
-			<option value="chromosome">CHROMOSOME</option>
+        </param>
+        <param argument="--include_loose" type="boolean" checked="false" truevalue="--include_loose" falsevalue="" label="Include loose hits" help="include loose hits in addition to strict and perfect hits"/>
+        <param argument="--low_quality" type="boolean" checked="false" truevalue="--low_quality" falsevalue="" label="Low quality" help="use for short contigs to predict partial genes"/>
+        <param argument="--data" type="select" multiple="false" label="Data type" help="specify a data-type (default = NA)">
+            <option value="wgs">WGS</option>
+            <option value="plasmid">PLASMID</option>
+            <option value="chromosome">CHROMOSOME</option>
             <option value="NA" selected="true">NA</option>
-		</param>
+        </param>
         <conditional name="db_opts">
             <param name="db_opts_selector" type="select" label="Select an RGI database">
                 <option value="local" selected="true">Locally installed RGI database</option>
@@ -70,9 +70,26 @@ rgi main
         <data name="summary" format="tabular" from_work_dir="out.txt" label="${tool.name} on ${on_string}: summary.txt"/>
     </outputs>
     <tests>
+        <test>
+            <param name="input_sequence" value="test1.fasta" />
+            <param name="input_type" value="contig" />
+            <param name="alignment_tool" value="blast" />
+            <param name="include_loose" value="false" />
+            <param name="low_quality" value="false" />
+            <param name="data" value="NA" />
+            <conditional name="db_opts">
+                <param name="db_opts_selector" value="hist" />
+                <param name="rgi_db_hist" value="testdb.json" />
+            </conditional>
+            <output name="summary">
+                <assert_contents>
+                    <has_text text="AY123251" />
+                </assert_contents>
+            </output>
+        </test>
     </tests>
     <help>
-	<![CDATA[
+    <![CDATA[
 Resistance Gene Identifier (RGI)
 ================================
 
@@ -154,7 +171,7 @@ RGI: https://card.mcmaster.ca/analyze/rgi
 Github: https://github.com/arpcard/rgi
 
 CARD database: https://card.mcmaster.ca
- 	]]>
+     ]]>
     </help>
     <citations>
         <citation type="doi">10.1093/nar/gkw1004</citation>
