@@ -1,133 +1,179 @@
-<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="3.2.0">
-    <description>This tool predict resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
+<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="4.2.2">
+    <description>This tool predicts resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
-        <requirement type="package" version="2.7">python</requirement>
-        <requirement type="package" version="3.2.0">rgi</requirement>
-        <requirement type="package" version="1.68">biopython</requirement>
-        <requirement type="package" version="1.10.0">six</requirement>
-        <requirement type="package" version="2.6.3">prodigal</requirement>
-        <requirement type="package" version="2.6.0">blast</requirement>
-        <requirement type="package" version="0.8.36">diamond</requirement>
-        <requirement type="package" version="1.2.8">zlib</requirement>
+        <requirement type="package" version="4.2.2">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
     <command><![CDATA[
-        rgi --input_sequence $input_sequence --input_type $input_type --num_threads "\${GALAXY_SLOTS:-32}" --clean_databases NO --verbose $verbose --alignment_tool $alignment_tool --loose_criteria $loose_criteria --clean $clean --db "${__tool_data_path__}/rgi_databases/$rgi_databases"
-    ]]></command>
+rgi load
+    #if $db_opts.db_opts_selector == "local":
+        -i "${__tool_data_path__}/rgi_databases/$db_opts.rgi_db_local/card.json" 
+    #else:
+        -i "$db_opts.rgi_db_hist"
+    #end if
+    --local
+&&
+rgi main
+    -i '$input_sequence'
+    -o out
+    -t $input_type
+    -a $alignment_tool
+    -n "\${GALAXY_SLOTS:-1}"
+    $include_loose
+    --local
+    $low_quality
+    -d $data
+       ]]></command>
     <inputs>
-        <param type="data" name="input_sequence" format="fastq,fasta" label="Input Sequence"/>
-        <param type="select" name="input_type"  label="Input Type" multiple="false">
-            <option value="contig" selected="true">CONTIG (Nucluotides Sequence)</option>
-            <option value="protein">PROTEIN (Protein Sequence)</option>
+        <param argument="--input_sequence" type="data" format="fastq,fasta" label="Input sequence" help="input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz"/>
+        <param argument="--input_type" type="select" multiple="false" label="Input type" help="specify data input type (default = contig)">
             <option value="read">READ (Metagenomics Sequence / FastQ)</option>
+            <option value="contig" selected="true">CONTIG (Nucleotide Sequence)</option>
+            <option value="protein">PROTEIN (Protein Sequence)</option>
+            <option value="wgs">WGS (Whole Genome Sequence)</option>
         </param>
-        <param type="select" name="alignment_tool"  label="Alignment Tool">
+        <param argument="--alignment_tool" type="select" label="Alignment tool" help="specify alignment tool (default = BLAST)">
             <option value="blast" selected="true">BLAST</option>
             <option value="diamond">DIAMOND</option>
         </param>
-        <param type="select" name="verbose"  label="Log progress to file (VERBOSE)" multiple="false">
-            <option value="off" selected="true">OFF</option>
-            <option value="on">ON</option>
+        <param argument="--include_loose" type="boolean" checked="false" truevalue="--include_loose" falsevalue="" label="Include loose hits" help="include loose hits in addition to strict and perfect hits"/>
+        <param argument="--low_quality" type="boolean" checked="false" truevalue="--low_quality" falsevalue="" label="Low quality" help="use for short contigs to predict partial genes"/>
+        <param argument="--data" type="select" multiple="false" label="Data type" help="specify a data-type (default = NA)">
+            <option value="wgs">WGS</option>
+            <option value="plasmid">PLASMID</option>
+            <option value="chromosome">CHROMOSOME</option>
+            <option value="NA" selected="true">NA</option>
         </param>
-        <param type="select" name="clean"  label="Remove temporary files (CLEAN)" multiple="false">
-            <option value="yes" selected="true">YES</option>
-            <option value="no">NO</option>
-        </param>
-        <param type="select" name="loose_criteria" label="Include loose hits (CRITERIA)" multiple="false">
-          <option value="yes">YES</option>
-          <option value="no" selected="true">NO</option>
-        </param>
-        <param label="Select a RGI database" name="rgi_databases" type="select">
-            <options from_data_table="rgi_databases">
-                <validator message="No databases are available built-in" type="no_options" />
-            </options>
-        </param>
+        <conditional name="db_opts">
+            <param name="db_opts_selector" type="select" label="Select an RGI database">
+                <option value="local" selected="true">Locally installed RGI database</option>
+                <option value="hist">RGI database from your history</option>
+            </param>
+            <when value="local">
+                <param name="rgi_db_local" type="select" multiple="false" label="Locally installed RGI database">
+                    <options from_data_table="rgi_databases">
+                        <validator type="no_options" message="No databases are available built-in"/>
+                    </options>
+                </param>
+                <param name="rgi_db_hist" type="hidden" value="" />
+            </when>
+            <when value="hist">
+                <param name="rgi_db_local" type="hidden" value="" />
+                <param name="rgi_db_hist" type="data" format="json" label="RGI database from your history" />
+            </when>
+        </conditional>
     </inputs>
     <outputs>
-        <data format="json" name="Report" from_work_dir="Report.json" label="${tool.name} on ${on_string}: (JSON)" />
-        <data format="tabular" name="Summary" from_work_dir="Report.txt" label="${tool.name} on ${on_string}: (TXT)" />
-        <data format="gff3" name="gff" from_work_dir="Report.gff3" label="${tool.name} on ${on_string}: (GFF3)" >
-            <filter>(input_type == 'contig')</filter>
-        </data>
+        <data name="report" format="json" from_work_dir="out.json" label="${tool.name} on ${on_string}: report.json"/>
+        <data name="summary" format="tabular" from_work_dir="out.txt" label="${tool.name} on ${on_string}: summary.txt"/>
     </outputs>
     <tests>
         <test>
-            <param name="inType" value="protein"/>
-            <param name="inputSeq" value="inputSeq.fasta"/>
-            <output name="Report" file="Report.json"/>
+            <param name="input_sequence" value="test1.fasta" />
+            <param name="input_type" value="contig" />
+            <param name="alignment_tool" value="blast" />
+            <param name="include_loose" value="false" />
+            <param name="low_quality" value="false" />
+            <param name="data" value="NA" />
+            <conditional name="db_opts">
+                <param name="db_opts_selector" value="hist" />
+                <param name="rgi_db_hist" value="testdb.json" />
+            </conditional>
+            <output name="summary">
+                <assert_contents>
+                    <has_text text="AY123251" />
+                </assert_contents>
+            </output>
         </test>
     </tests>
     <help>
-      <![CDATA[
-        usage: rgi [-h] [-t INTYPE] [-i INPUTSEQ] [-n THREADS] [-k NUM_SEQUENCES]
-                   [-o OUTPUT] [-e CRITERIA] [-c CLEAN] [-cd CLEAN_DATABASES]
-                   [-d DATA] [-l VERBOSE] [-a ALIGNER] [-r DATABASE] [-sv] [-dv]
+    <![CDATA[
+Resistance Gene Identifier (RGI)
+================================
 
-        Resistance Gene Identifier - Version 3.2.0
+RGI is used to predict resistome(s) from protein or nucleotide data based on homology and SNP models. The tool uses data from the CARD database.
 
-        optional arguments:
-          -h, --help            show this help message and exit
-          -t INTYPE, --input_type INTYPE
-                                must be one of contig, protein and read (default: contig)
+Usage
+-----
 
-          -i INPUTSEQ, --input_sequence INPUTSEQ
-                                input file must be in either FASTA (contig and
-                                protein), FASTQ(read) or gzip format! e.g
-                                myFile.fasta, myFasta.fasta.gz
+1. Select your input sequence (in FASTA format).
+2. Select your input type (READ, CONTIG, PROTEIN or WGS).
+3. Select your alignment tool (DIAMOND or BLAST).  
+4. Specify if you want to include loose hits (YES or NO).
+5. Specify if you want to remove temporary files (YES or NO).
+6. Specify if you want to low quality predictions (YES or NO).
+7. Select your data type (WGS, PLASMID, CHROMOSOME or NA). 
+8. Run the tool.
 
-          -n THREADS, --num_threads THREADS
-                                Number of threads (CPUs) to use in the BLAST search
-                                (default=32)
+Output
+------
 
-          -k NUM_SEQUENCES, --max_target_seqs NUM_SEQUENCES
-                                maximum number of target sequences to report
-                                alignments for (default=1)
+There are 2 different output files produced by `rgi`.
 
-          -o OUTPUT, --output_file OUTPUT
-                                Output JSON file (default=Report)
+summary.txt
+^^^^^^^^^^^
 
-          -e CRITERIA, --loose_criteria CRITERIA
-                                The options are YES to include loose hits and NO to
-                                exclude loose hits. (default=NO to exclude loose hits)
+A tabular file of all detected resistance genes, one gene per line.
 
-          -c CLEAN, --clean CLEAN
-                                This removes temporary files in the results directory
-                                after run. Options are NO or YES (default=YES for remove)
++--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+---------------------------+------------------------+---------------------------+-----------------------------------------+--------------------------------+-----------+
+| ORF_ID                                                                                                                   | Contig        | Start | Stop | Orientation | Cut_Off  | Pass_Bitscore  | Best_Hit_Bitscore   | Best_Hit_ARO   | Best_Identities  | ARO      | Model_type            | SNPs_in_Best_Hit_ARO     | Other_SNPs  | Drug Class | Resistance Mechanism    | AMR Gene Family      | Predicted_DNA             | Predicted_Protein      | CARD_Protein_Sequence     | Percentage Length of Reference Sequence | ID                             | Model_ID  |
++==========================================================================================================================+===============+=======+======+=============+==========+================+=====================+================+==================+==========+=======================+==========================+=============+============+=========================+======================+===========================+========================+===========================+=========================================+================================+===========+
+| AY123251.1_6 # 3575 # 4489 # 1 # ID=1_6;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.399           | AY123251.1_6  | 3575  | 4489 | \+          | Strict   | 500            | 506.908             | CARB-7         | 83.68            | 3002246  | protein homolog model | n/a                      | n/a         | penam      | antibiotic inactivation | CARB beta-lactamase  | ATGC                      | MLLYKMCDNQNYGVTYMKFLLV | MKSLLVFALLMPSVVFASSSKFQSV | 105.56                                  | gnl|BL_ORD_ID|589|hsp_num:0    | 1443      |
++--------------------------------------------------------------------------------------------------------------------------+---------------+-------+------+-------------+----------+----------------+---------------------+----------------+------------------+----------+-----------------------+--------------------------+-------------+------------+-------------------------+----------------------+---------------------------+------------------------+---------------------------+-----------------------------------------+--------------------------------+-----------+
 
-          --clean_databases CLEAN_DATABASES
-                                This removes blast databases before rgi run. Options
-                                are NO or YES (default=YES for remove)
+report.json
+^^^^^^^^^^^
 
-          -d DATA, --data DATA  Specify a data-type, i.e. wgs, chromosome, plasmid,
-                                etc. (default = NA)
+A json version of summary.txt.
 
-          -l VERBOSE, --verbose VERBOSE
-                                log progress to file. Options are OFF or ON (default =
-                                OFF for no logging)
+Help
+----
 
-          -a ALIGNER, --alignment_tool ALIGNER
-                                choose between BLAST and DIAMOND. Options are BLAST or
-                                DIAMOND (default = BLAST)
+**usage:**
+    ``rgi main [-h] -i INPUT_SEQUENCE -o OUTPUT_FILE [-t {read,contig,protein,wgs}] [-a {DIAMOND,BLAST}] [-n THREADS] [--include_loose] [--local] [--clean] [--debug] [--low_quality] [-d {wgs,plasmid,chromosome,NA}] [-v]``
 
-          -r DATABASE, --db DATABASE
-                                specify path to CARD blast databases (default: None)
+**optional arguments:**
 
-          -sv, --software_version
-                                Prints software number
+- ``-h, --help``
+    show this help message and exit
+- ``-i INPUT_SEQUENCE, --input_sequence INPUT_SEQUENCE``
+    input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz
+- ``-o OUTPUT_FILE, --output_file OUTPUT_FILE``
+    output folder and base filename
+- ``-t {read,contig,protein,wgs}, --input_type {read,contig,protein,wgs}``
+    specify data input type (default = contig)
+- ``-a {DIAMOND,BLAST}, --alignment_tool {DIAMOND,BLAST}``
+    specify alignment tool (default = BLAST)
+- ``-n THREADS, --num_threads THREADS``
+    number of threads (CPUs) to use in the BLAST search (default=8)
+- ``--include_loose``
+    include loose hits in addition to strict and perfect hits
+- ``--local``
+    use local database (default: uses database in executable directory)
+- ``--clean``
+    removes temporary files
+- ``--debug``
+    debug mode
+- ``--low_quality``
+    use for short contigs to predict partial genes
+- ``-d {wgs,plasmid,chromosome,NA}, --data {wgs,plasmid,chromosome,NA}``
+    specify a data-type (default = NA)
+- ``-v, --version``
+    prints software version number
 
-          -dv, --data_version   
-                                Prints data version number
-    ]]>
+Links
+-----
+
+RGI: https://card.mcmaster.ca/analyze/rgi
+
+Github: https://github.com/arpcard/rgi
+
+CARD database: https://card.mcmaster.ca
+     ]]>
     </help>
     <citations>
-        <citation type="bibtex">
-@misc{renameTODO,
-  author = {LastTODO, FirstTODO},
-  year = {TODO},
-  title = {TODO},
-  url = {https://card.mcmaster.ca/about},
-}</citation>
+        <citation type="doi">10.1093/nar/gkw1004</citation>
     </citations>
 </tool>
