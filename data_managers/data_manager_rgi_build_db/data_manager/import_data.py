@@ -9,11 +9,6 @@ import urllib2
 import zipfile
 
 path = os.path.join(os.getcwd(), 'rgi-database') + "/"
-"""
-if not os.path.exists(path):
-    print "[import_data] mkdir: ", path
-    os.makedirs(path)
-"""
 data_path = path
 
 def url_download(url, workdir):
@@ -45,7 +40,6 @@ def url_download(url, workdir):
         fh = zipfile.ZipFile(file_path, 'r')
     else:
         return
-    #fh.extractall(workdir)
     # extract only one file : card.json
     for member in fh.getmembers():
         if member.isreg():  # skip if the TarInfo is not files

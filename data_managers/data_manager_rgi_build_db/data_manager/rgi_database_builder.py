@@ -17,7 +17,6 @@ args = parser.parse_args()
 
 print "[rgi_database_builder] Importing..."
 
-#version = _main(args)
 _main(args)
 
 def main(args):
@@ -25,7 +24,6 @@ def main(args):
 
     data_manager_entry = {}
     data_manager_entry['value'] = args.name.lower()
-    #data_manager_entry['name'] = str(args.name) + " | CARD data version: " + str(version)
     data_manager_entry['name'] = args.name
     data_manager_entry['path'] = '.'
 
