@@ -5,7 +5,7 @@ import os
 import shutil
 import sys
 import tarfile
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 from import_data import run, _main
 
@@ -15,12 +15,12 @@ parser.add_argument('--out', dest='output', action='store', help='JSON filename'
 parser.add_argument('--name', dest='name', action='store', default='CARD_data-'+str(datetime.datetime.now().strftime("%Y-%B-%d-%H:%M:%S")), help='Data table database name')
 args = parser.parse_args()
 
-print "[rgi_database_builder] Importing..."
+print("[rgi_database_builder] Importing...")
 
 _main(args)
 
 def main(args):
-    print "[rgi_database_builder] Building......"
+    print("[rgi_database_builder] Building......")
 
     data_manager_entry = {}
     data_manager_entry['value'] = args.name.lower()
@@ -36,9 +36,9 @@ def main(args):
     output_path = os.path.join(os.getcwd(), 'rgi-database')
 
     for filename in os.listdir(output_path):
-        print "[rgi_database_builder] move file: ", filename, " from ",output_path," to ", target_directory
+        print("[rgi_database_builder] move file: ", filename, " from ",output_path," to ", target_directory)
         shutil.move(os.path.join(output_path, filename), target_directory)
-    print "[rgi_database_builder] write file: ", args.output
+    print("[rgi_database_builder] write file: ", args.output)
     file(args.output, 'w').write(json.dumps(data_manager_json))
 
 if __name__ == '__main__':
