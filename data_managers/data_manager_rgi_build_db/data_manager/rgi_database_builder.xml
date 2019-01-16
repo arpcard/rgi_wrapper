@@ -2,12 +2,12 @@
 <tool id="rgi_database_builder" name="RGI Database Builder" tool_type="manage_data" version="1.0.0">
     <description>Download and build the CARD database for RGI</description>
     <requirements>
-        <requirement type="package" version="4.2.2">rgi</requirement>
+	<requirement type="package" version="4.2.2">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code description="Error" level="fatal" range="1:" />
     </stdio>
-    <command interpreter="python">
+    <command interpreter="python3">
     <![CDATA[
         rgi_database_builder.py --out "${out_file}"
         #if $name:
@@ -23,6 +23,6 @@
         <param name="url" type="text" value="https://card.mcmaster.ca/latest/data" label="Url" help="Url for the CARD data e.g https://card.mcmaster.ca/lastest/data. Visit https://card.mcmaster.ca/download to see previous CARD releases." optional="True"/>
     </inputs>
     <outputs>
-        <data format="data_manager_json" name="out_file"  label="${tool.name} (JSON)"/>
+        <data format="data_manager_json" name="out_file" label="${tool.name} (JSON)"/>
     </outputs>
 </tool>

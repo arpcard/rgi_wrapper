@@ -8,7 +8,7 @@ import tarfile
 import urllib.request, urllib.error, urllib.parse
 import zipfile
 
-path = os.path.join(os.getcwd(), 'rgi-database') + '/'
+path = os.path.join(os.getcwd(), 'rgi-database') 
 data_path = path
 
 def url_download(url, workdir):
@@ -45,7 +45,7 @@ def url_download(url, workdir):
         if member.isreg():  # skip if the TarInfo is not files
             member.name = os.path.basename(member.name) # remove the path by reset it
             if member.name == 'card.json':
-                print('[import_data] extracting file: ' , str(member.name))
+                print('[import_data] extracting file: {}'.format(str(member.name)))
                 fh.extract(member.name,workdir)
     os.remove(file_path)
 
@@ -59,11 +59,10 @@ def checkKeyExisted(key, my_dict):
 def writeFASTAfromJson():
     noSeqList = []
 
-    if os.path.isfile(path+'proteindb.fsa') == False:
-        with open(data_path+'card.json') as json_file:
+    if os.path.isfile(os.path.join(path, 'proteindb.fsa')) == False:
+        with open(os.path.join(data_path, 'card.json')) as json_file:
             json_data = json.load(json_file)
-            with open (path+'proteindb.fsa', 'w') as wp:
-
+            with open(os.path.join(path, 'proteindb.fsa'), 'w') as wp:
                 for item in json_data:
                     if item.isdigit(): #get rid of __comment __timestamp etc
                         # model_type: blastP only (pass_evalue)
@@ -74,9 +73,8 @@ def writeFASTAfromJson():
                                     pass_eval = json_data[item]['model_param']['blastp_evalue']['param_value']
                             if checkKeyExisted('model_sequences', json_data[item]):
                                 for seqkey in json_data[item]['model_sequences']['sequence']:
-                                    print(('>' + item + '_' + seqkey + ' | model_type_id: 40292' + ' | pass_evalue: ' + str(pass_eval)), file=wp)
-                                    test = json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence']
-                                    print(test, file=wp)
+                                    print('>{}_{} | model_type_id: 40292 | pass evalue: {}'.format( item, seqkey, str(pass_eval)), file=wp)
+                                    print(json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence'], file=wp)
                             else:
                                 noSeqList.append(item)
 
@@ -93,8 +91,8 @@ def writeFASTAfromJson():
                                         snpList += ','
                             if checkKeyExisted('model_sequences', json_data[item]):
                                 for seqkey in json_data[item]['model_sequences']['sequence']:
-                                    print(('>' + item + '_' + seqkey + ' | model_type_id: 40293' + ' | pass_evalue: ' + str(pass_eval) + ' | SNP: ' + snpList), file=wp)
-                                    print((json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence']), file=wp)
+                                    print('>{}_{} | model_type_id: 40293 | pass evalue: {}'.format( item, seqkey, str(pass_eval)), file=wp)
+                                    print(json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence'], file=wp)
                             else:
                                 noSeqList.append(item)
             wp.close()
@@ -102,7 +100,7 @@ def writeFASTAfromJson():
 
 def data_version():
     data_version = ''
-    with open(data_path+'card.json') as json_file:
+    with open(os.path.join(data_path, 'card.json')) as json_file:
         json_data = json.load(json_file)
         for item in list(json_data.keys()):
             if item == '_version':
@@ -111,35 +109,35 @@ def data_version():
     return data_version
 
 def makeBlastDB():
-    if os.path.isfile(path+'proteindb.fsa') == True:
+    if os.path.isfile(os.path.join(path, 'proteindb.fsa')) == True:
         print('[import_data] create blast DB.')
-        os.system('makeblastdb -in '+path+'proteindb.fsa -dbtype prot -out '+path+'protein.db > /dev/null 2>&1')
+        os.system('makeblastdb -in {}/proteindb.fsa -dbtype prot -out {}/protein.db > /dev/null 2>&1'.format(path, path))
 
 def makeDiamondDB():
-    if os.path.isfile(path+'proteindb.fsa') == True:
+    if os.path.isfile(os.path.join(path, 'proteindb.fsa')) == True:
         print('[import_data] create diamond DB.')
-        os.system('diamond makedb --quiet --in '+path+'proteindb.fsa --db '+path+'protein.db')
-
+        os.system('diamond makedb --quiet --in {}/proteindb.fsa --db {}/protein.db'.format(path, path))
+        
 def _main(args):
     if not os.path.exists(path):
-        print('[import_data] mkdir: ', path)
+        print('[import_data] mkdir: {}'.format(path))
         os.makedirs(path)
-    print('[import_data] path: ', path)
+    print('[import_data] path: {}'.format(path))
     print(args)
 
     if args.url == None:
         url = 'https://card.mcmaster.ca/latest/data'
     else:
         url = args.url
-    print('[import_data] url: ', url)
+    print('[import_data] url: {}'.format(url))
     workdir = os.path.join(os.getcwd(), 'rgi-database')
-    print('[import_data] working directory: ', workdir)
+    print('[import_data] working directory: {}'.format(workdir))
     url_download(url, workdir)
     writeFASTAfromJson()
     makeBlastDB()
     makeDiamondDB()
     version = data_version()
-    print('[import_data] data version: ', version)
+    print('[import_data] data version: {}'.format(version))
     return version
 
 def run():
