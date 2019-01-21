@@ -7,6 +7,7 @@ import sys
 import tarfile
 import urllib.request, urllib.error, urllib.parse
 import zipfile
+import rgi.database.write_fasta_from_json
 
 path = os.path.join(os.getcwd(), 'rgi-database') 
 data_path = path
@@ -56,48 +57,6 @@ def checkKeyExisted(key, my_dict):
         nonNone = False
     return nonNone
 
-def writeFASTAfromJson():
-    noSeqList = []
-
-    if os.path.isfile(os.path.join(path, 'proteindb.fsa')) == False:
-        with open(os.path.join(data_path, 'card.json')) as json_file:
-            json_data = json.load(json_file)
-            with open(os.path.join(path, 'proteindb.fsa'), 'w') as wp:
-                for item in json_data:
-                    if item.isdigit(): #get rid of __comment __timestamp etc
-                        # model_type: blastP only (pass_evalue)
-                        if json_data[item]['model_type_id'] == '40292':
-                            pass_eval = 1e-30
-                            if checkKeyExisted('model_param', json_data[item]):
-                                if checkKeyExisted('blastp_evalue', json_data[item]['model_param']):
-                                    pass_eval = json_data[item]['model_param']['blastp_evalue']['param_value']
-                            if checkKeyExisted('model_sequences', json_data[item]):
-                                for seqkey in json_data[item]['model_sequences']['sequence']:
-                                    print('>{}_{} | model_type_id: 40292 | pass evalue: {}'.format( item, seqkey, str(pass_eval)), file=wp)
-                                    print(json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence'], file=wp)
-                            else:
-                                noSeqList.append(item)
-
-                        # model_type: blastP + SNP (pass_evalue + snp)
-                        elif json_data[item]['model_type_id'] == '40293':
-                            snpList = ''
-                            pass_eval = 1e-30
-                            if checkKeyExisted('model_param', json_data[item]):
-                                if checkKeyExisted('blastp_evalue', json_data[item]['model_param']):
-                                    pass_eval = json_data[item]['model_param']['blastp_evalue']['param_value']
-                                if checkKeyExisted('snp', json_data[item]['model_param']):
-                                    for key in json_data[item]['model_param']['snp']['param_value']:
-                                        snpList += json_data[item]['model_param']['snp']['param_value'][key]
-                                        snpList += ','
-                            if checkKeyExisted('model_sequences', json_data[item]):
-                                for seqkey in json_data[item]['model_sequences']['sequence']:
-                                    print('>{}_{} | model_type_id: 40293 | pass evalue: {}'.format( item, seqkey, str(pass_eval)), file=wp)
-                                    print(json_data[item]['model_sequences']['sequence'][seqkey]['protein_sequence']['sequence'], file=wp)
-                            else:
-                                noSeqList.append(item)
-            wp.close()
-        json_file.close()
-
 def data_version():
     data_version = ''
     with open(os.path.join(data_path, 'card.json')) as json_file:
@@ -133,7 +92,7 @@ def _main(args):
     workdir = os.path.join(os.getcwd(), 'rgi-database')
     print('[import_data] working directory: {}'.format(workdir))
     url_download(url, workdir)
-    writeFASTAfromJson()
+    rgi.database.write_fasta_from_json()
     makeBlastDB()
     makeDiamondDB()
     version = data_version()
