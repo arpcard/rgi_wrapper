@@ -7,10 +7,14 @@ import sys
 import tarfile
 import urllib.request, urllib.error, urllib.parse
 import zipfile
-import rgi.database.write_fasta_from_json
+import logging
 
 path = os.path.join(os.getcwd(), 'rgi-database') 
 data_path = path
+
+level = logging.WARNING
+logger = logging.getLogger(__name__)
+logger.setLevel(level)
 
 def url_download(url, workdir):
     file_path = os.path.join(workdir, 'download.dat')
@@ -76,7 +80,93 @@ def makeDiamondDB():
     if os.path.isfile(os.path.join(path, 'proteindb.fsa')) == True:
         print('[import_data] create diamond DB.')
         os.system('diamond makedb --quiet --in {}/proteindb.fsa --db {}/protein.db'.format(path, path))
-        
+
+def write_fasta_from_json():
+		'''Creates a fasta file from card.json file.'''
+		if os.path.isfile(os.path.join(path, 'proteindb.fsa')):
+			return
+		else:
+			try:
+				with open(os.path.join(data_path, 'card.json'), 'r') as jfile:
+					j = json.load(jfile)
+			except Exception as e:
+				logger.error(e)
+				exit()
+
+			with open(os.path.join(path, 'proteindb.fsa'), 'w') as fout:
+				for i in j:
+					if i.isdigit():
+		            	# model_type: protein homolog model
+						if j[i]['model_type_id'] == '40292':
+							try:
+								pass_bit_score = j[i]['model_param']['blastp_bit_score']['param_value']
+							except KeyError:
+								logger.warning('No bitscore for model (%s, %s). RGI will omit this model and keep running.' \
+									% (j[i]['model_id'], j[i]['model_name']))
+								logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+							else:
+								try:
+									for seq in j[i]['model_sequences']['sequence']:
+										fout.write('>%s_%s | model_type_id: 40292 | pass_bitscore: %s | %s\n' % (i, seq, pass_bit_score, j[i]['ARO_name']))
+										fout.write('%s\n' %(j[i]['model_sequences']['sequence'][seq]['protein_sequence']['sequence']))
+								except Exception as e:
+									logger.warning('No model sequences for model (%s, %s). RGI will omit this model and keep running.' \
+										% (j[i]['model_id'], j[i]['model_name']))
+									logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+
+
+		            	# model_type: protein variant model
+						elif j[i]['model_type_id'] == '40293':
+							try:
+								pass_bit_score = j[i]['model_param']['blastp_bit_score']['param_value']
+							except KeyError:
+								logger.warning('No bitscore for model (%s, %s). RGI will omit this model and keep running.' \
+									% (j[i]['model_id'], j[i]['model_name']))
+								logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+							else:
+								try:
+									snpList = [j[i]['model_param']['snp']['param_value'][k] for k in j[i]['model_param']['snp']['param_value']]
+								except Exception as e:
+									logger.warning('No snp for model (%s, %s). RGI will omit this model and keep running.' \
+										% (j[i]['model_id'], j[i]['model_name']))
+									logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+
+								try:
+									for seq in j[i]['model_sequences']['sequence']:
+										fout.write('>%s_%s | model_type_id: 40293 | pass_bit_score: %s | SNP: %s | %s\n' \
+											% (i, seq, pass_bit_score, ','.join(snpList), j[i]['ARO_name']))
+										fout.write('%s\n' % (j[i]['model_sequences']['sequence'][seq]['protein_sequence']['sequence']))
+								except Exception as e:
+									logger.warning('No model sequences for model (%s, %s). RGI will omit this model and keep running.' \
+										% (j[i]['model_id'], j[i]['model_name']))
+									logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+
+		            	# model_type: protein overexpression model
+						elif j[i]['model_type_id'] == '41091':
+							try:
+								pass_bit_score = j[i]['model_param']['blastp_bit_score']['param_value']
+							except KeyError:
+								logger.warning('No bitscore for model (%s, %s). RGI will omit this model and keep running.' \
+									% (j[i]['model_id'], j[i]['model_name']))
+								logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+							else:
+								try:
+									snpList = [j[i]['model_param']['snp']['param_value'][k] for k in j[i]['model_param']['snp']['param_value']]
+								except Exception as e:
+									logger.warning('No snp for model (%s, %s). RGI will omit this model and keep running.' \
+										% (j[i]['model_id'], j[i]['model_name']))
+									logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+
+								try:
+									for seq in j[i]['model_sequences']['sequence']:
+										fout.write('>%s_%s | model_type_id: 41091 | pass_bit_score: %s | SNP: %s | %s\n' \
+											% (i, seq, pass_bit_score, ','.join(snpList), j[i]['ARO_name']))
+										fout.write('%s\n' % (j[i]['model_sequences']['sequence'][seq]['protein_sequence']['sequence']))
+								except Exception as e:
+									logger.warning('No model sequences for model (%s, %s). RGI will omit this model and keep running.' \
+										% (j[i]['model_id'], j[i]['model_name']))
+									logger.info('Please let the CARD Admins know! Email: card@mcmaster.ca')
+
 def _main(args):
     if not os.path.exists(path):
         print('[import_data] mkdir: {}'.format(path))
@@ -92,7 +182,7 @@ def _main(args):
     workdir = os.path.join(os.getcwd(), 'rgi-database')
     print('[import_data] working directory: {}'.format(workdir))
     url_download(url, workdir)
-    rgi.database.write_fasta_from_json()
+    write_fasta_from_json()
     makeBlastDB()
     makeDiamondDB()
     version = data_version()
