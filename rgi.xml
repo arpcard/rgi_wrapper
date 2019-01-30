@@ -33,12 +33,10 @@ rgi main
 #end if
        ]]></command>
     <inputs>
-        <param argument="--input_sequence" type="data" format="fastq,fasta" label="Input sequence" help="input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz"/>
+        <param argument="--input_sequence" type="data" format="fastq,fasta" label="Input sequence" help="input file must be in either FASTA (contig and protein) or gzip format e.g myFile.fasta, myFasta.fasta.gz"/>
         <param argument="--input_type" type="select" multiple="false" label="Input type" help="specify data input type (default = contig)">
-            <option value="read">READ (Metagenomics Sequence / FastQ)</option>
             <option value="contig" selected="true">CONTIG (Nucleotide Sequence)</option>
             <option value="protein">PROTEIN (Protein Sequence)</option>
-            <option value="wgs">WGS (Whole Genome Sequence)</option>
         </param>
         <param argument="--alignment_tool" type="select" label="Alignment tool" help="specify alignment tool (default = BLAST)">
             <option value="blast" selected="true">BLAST</option>
@@ -109,7 +107,7 @@ Usage
 -----
 
 1. Select your input sequence (in FASTA format).
-2. Select your input type (READ, CONTIG, PROTEIN or WGS).
+2. Select your input type (CONTIG or PROTEIN).
 3. Select your alignment tool (DIAMOND or BLAST).  
 4. Specify if you want to include loose hits (YES or NO).
 5. Specify if you want to remove temporary files (YES or NO).
@@ -149,7 +147,7 @@ Help
 - ``-h, --help``
     show this help message and exit
 - ``-i INPUT_SEQUENCE, --input_sequence INPUT_SEQUENCE``
-    input file must be in either FASTA (contig and protein), FASTQ(read) or gzip format! e.g myFile.fasta, myFasta.fasta.gz
+    input file must be in either FASTA (contig and protein) or gzip format e.g myFile.fasta, myFasta.fasta.gz
 - ``-o OUTPUT_FILE, --output_file OUTPUT_FILE``
     output folder and base filename
 - ``-t {read,contig,protein,wgs}, --input_type {read,contig,protein,wgs}``
