@@ -6,7 +6,7 @@
     <stdio>
         <exit_code range="1:" />
     </stdio>
-    <command><![CDATA[
+    <command detect_errors="aggressive"><![CDATA[
 #if $db_opts.db_opts_selector != "default":
     rgi load
         #if $db_opts.db_opts_selector == "local":
