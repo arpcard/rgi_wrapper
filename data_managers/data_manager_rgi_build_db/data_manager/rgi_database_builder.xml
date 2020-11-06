@@ -3,7 +3,6 @@
     <description>Download and build the CARD database for RGI</description>
     <requirements>
 	<requirement type="package" version="5.1.0">rgi</requirement>
-	<requirement type="package" version="3">python</requirement>
     </requirements>
     <stdio>
         <exit_code description="Error" level="fatal" range="1:" />
