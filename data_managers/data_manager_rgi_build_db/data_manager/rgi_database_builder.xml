@@ -7,9 +7,9 @@
     <stdio>
         <exit_code description="Error" level="fatal" range="1:" />
     </stdio>
-    <command interpreter="python3">
+    <command>
     <![CDATA[
-        rgi_database_builder.py --out "${out_file}"
+        python3 rgi_database_builder.py --out "${out_file}"
         #if $name:
             --name "${name}"
         #end if
