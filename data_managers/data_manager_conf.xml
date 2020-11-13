@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <data_managers>
-    <data_manager tool_file="data_manager_rgi_build_db/data_manager/rgi_database_builder.xml" id="rgi_database_builder" version="1.0.0">
+    <data_manager tool_file="data_manager_rgi_build_db/data_manager/rgi_database_builder.xml" id="rgi_database_builder" version="1.1.0">
         <!-- Defines a Data Table to be modified -->
         <data_table name="rgi_databases">
             <!-- Handle the output of the Data Manager Tool -->
