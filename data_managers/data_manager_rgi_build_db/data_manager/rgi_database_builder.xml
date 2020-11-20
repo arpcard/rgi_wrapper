@@ -9,7 +9,7 @@
     </stdio>
     <command>
     <![CDATA[
-        python3 rgi_database_builder.py --out "${out_file}"
+        python3 '$__tool_directory__/rgi_database_builder.py' --out "${out_file}"
         #if $name:
             --name "${name}"
         #end if
