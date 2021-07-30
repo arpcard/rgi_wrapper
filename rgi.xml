@@ -1,7 +1,7 @@
-<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="5.1.2">
+<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="5.2.1">
     <description>This tool predicts resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
-        <requirement type="package" version="5.1.2">rgi</requirement>
+        <requirement type="package" version="5.2.1">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
