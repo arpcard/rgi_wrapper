@@ -1,12 +1,18 @@
-<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="5.1.1">
+<tool id="rgi" name="Resistance Gene Identifier (RGI)" version="5.1.2">
     <description>This tool predicts resistome(s) from protein or nucleotide data based on homology and SNP models.</description>
     <requirements>
-        <requirement type="package" version="5.1.1">rgi</requirement>
+        <requirement type="package" version="5.1.2">rgi</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
     <command detect_errors="aggressive"><![CDATA[
+#if $db_opts.db_opts_selector == "default":
+    export DB_PATH='${__tool_data_path__}/rgi_databases/_default' &&
+    export DATA_PATH="\$_GALAXY_JOB_TMP_DIR" &&
+    mkdir -p "\$DB_PATH" &&
+#end if
+
 #if $db_opts.db_opts_selector != "default":
     rgi load
         #if $db_opts.db_opts_selector == "local":
