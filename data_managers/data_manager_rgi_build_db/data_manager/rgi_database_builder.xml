@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<tool id="rgi_database_builder" name="RGI Database Builder" tool_type="manage_data" version="1.2.0">
+<tool id="rgi_database_builder" name="RGI Database Builder" profile="18.09" tool_type="manage_data" version="1.2.0">
     <description>Download and build the CARD database for RGI</description>
     <requirements>
 	<requirement type="package" version="5.2.1">rgi</requirement>
